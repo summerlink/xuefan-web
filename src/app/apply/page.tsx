@@ -10,7 +10,26 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Upload, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
+import { levelLabels } from "@/lib/translation"
+
+interface Course {
+  id: number
+  name: string
+  relatedSchools: {
+    name: string
+    relatedUniversities: {
+      name: string
+    }
+  }
+  level: string
+  currency: string
+  fee: number
+  durationInMonth: string[]
+  intakes: string[]
+  locations: string[]
+}
 
 interface UploadedFile {
   name: string
@@ -20,10 +39,27 @@ interface UploadedFile {
 
 export default function ApplyPage() {
   const searchParams = useSearchParams()
-  const university = searchParams.get("university")
-  const course = searchParams.get("course")
+  const courseId = searchParams.get("courseId")
+  const [course, setCourse] = useState<Course | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const router = useRouter()
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      if (!courseId) return
+      try {
+        const response = await fetch(`https://homeseek-cms.vercel.app/api/courses/${courseId}?depth=2`)
+        const data = await response.json()
+        setCourse(data)
+      } catch (error) {
+        console.error("Error fetching course:", error)
+      }
+      setIsLoading(false)
+    }
+
+    fetchCourse()
+  }, [courseId])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -55,6 +91,26 @@ export default function ApplyPage() {
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
   }
 
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">加载中...</div>
+        </div>
+      </main>
+    )
+  }
+
+  if (!course) {
+    return (
+      <main className="flex min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">课程未找到</div>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="flex min-h-screen">
       <div className="container mx-auto px-4 py-8">
@@ -70,7 +126,7 @@ export default function ApplyPage() {
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-slate-800 mb-2">申请表</h1>
             <p className="text-slate-600">
-              申请 {university} - {course}
+              {course.relatedSchools.relatedUniversities.name} - {course.name} - {levelLabels[course.level]}
             </p>
           </div>
 
@@ -169,4 +225,3 @@ export default function ApplyPage() {
     </main>
   )
 }
-

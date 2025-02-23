@@ -12,6 +12,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { locationLabels, levelLabels, intakeLabels } from "@/lib/translation"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -44,40 +45,6 @@ const filterOptions = {
   location: ["全部", "selangor", "johor", "penang", "kuala_lumpur", "kuching", "sarawak", "perak"],
   level: ["全部", "foundation", "diploma", "degree", "master", "phd", "certificate"],
   intake: ["全部", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-}
-
-const locationLabels: Record<string, string> = {
-  selangor: "雪兰莪",
-  johor: "柔佛",
-  penang: "槟城",
-  kuala_lumpur: "吉隆坡",
-  kuching: "古晋",
-  sarawak: "砂拉越",
-  perak: "霹雳",
-}
-
-const levelLabels: Record<string, string> = {
-  foundation: "预科",
-  diploma: "专科",
-  degree: "本科",
-  master: "硕士",
-  phd: "博士",
-  certificate: "证书",
-}
-
-const intakeLabels: Record<string, string> = {
-  "1": "1月",
-  "2": "2月",
-  "3": "3月",
-  "4": "4月",
-  "5": "5月",
-  "6": "6月",
-  "7": "7月",
-  "8": "8月",
-  "9": "9月",
-  "10": "10月",
-  "11": "11月",
-  "12": "12月",
 }
 
 type FilterKey = "location" | "level" | "intake"
@@ -151,10 +118,10 @@ export default function CoursesPage() {
     router.push(`/courses?${params.toString()}`)
   }
 
-  const handleApply = (university: string, course: string) => {
+  const handleApply = (university: string, courseId: number) => {
     const params = new URLSearchParams({
       university,
-      course,
+      courseId: courseId.toString(),
     })
     router.push(`/apply?${params.toString()}`)
   }
@@ -177,7 +144,7 @@ export default function CoursesPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-600">地点</label>
               <Select value={filters.location || "全部"} onValueChange={(value) => updateFilters("location", value)}>
-                <SelectTrigger className="bg-white/80 backdrop-blur-sm">
+                <SelectTrigger className="bg-white/70 backdrop-blur-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -193,7 +160,7 @@ export default function CoursesPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-600">学历</label>
               <Select value={filters.level || "全部"} onValueChange={(value) => updateFilters("level", value)}>
-                <SelectTrigger className="bg-white/80 backdrop-blur-sm">
+                <SelectTrigger className="bg-white/70 backdrop-blur-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,7 +176,7 @@ export default function CoursesPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-600">入学时间</label>
               <Select value={filters.intake || "全部"} onValueChange={(value) => updateFilters("intake", value)}>
-                <SelectTrigger className="bg-white/80 backdrop-blur-sm">
+                <SelectTrigger className="bg-white/70 backdrop-blur-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -226,12 +193,12 @@ export default function CoursesPage() {
 
         <div className="mb-4 text-sm text-slate-600">共找到 {courses?.totalDocs || 0} 个结果</div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
           {isLoading ? (
             <div className="text-center py-8">加载中...</div>
           ) : (
             courses?.docs.map((course) => (
-              <Card key={course.id} className="bg-white/80 backdrop-blur-sm">
+              <Card key={course.id} className="bg-white/70 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-slate-800">{course.name}</CardTitle>
                 </CardHeader>
@@ -269,10 +236,7 @@ export default function CoursesPage() {
                         {course.intakes.map((intake) => intakeLabels[intake]).join(", ")}
                       </span>
                     </div>
-                    <Button
-                      className="mt-4 w-full"
-                      onClick={() => handleApply(course.relatedSchools.name, course.name)}
-                    >
+                    <Button className="mt-4 w-full" onClick={() => handleApply(course.relatedSchools.name, course.id)}>
                       提交申请
                     </Button>
                   </div>
