@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { locationLabels, levelLabels, intakeLabels } from "@/lib/translation"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useState } from "react"
+import { formatNumber } from "@/lib/utils"
 
 interface Course {
   id: number
@@ -198,7 +199,7 @@ function CoursesPageContent() {
           </div>
         </div>
 
-        <div className="mb-4 text-sm text-slate-600">共找到 {courses?.totalDocs || 0} 个结果</div>
+        <div className="mb-4 text-sm text-slate-600">共找到 {formatNumber(courses?.totalDocs || 0)} 个结果</div>
 
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
           {isLoading ? (

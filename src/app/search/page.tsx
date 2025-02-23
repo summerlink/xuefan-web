@@ -88,7 +88,7 @@ export default function SearchPage() {
           返回首页
         </Link>
 
-        <div className="rounded-xl bg-white/80 backdrop-blur-sm p-6 shadow-lg">
+        <div className="rounded-xl bg-white/70 backdrop-blur-sm p-6 shadow-lg">
           {/* Progress bar */}
           <div className="mb-8">
             <div className="flex justify-between mb-2">
