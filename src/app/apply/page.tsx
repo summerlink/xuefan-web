@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Upload, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 
 import { levelLabels } from "@/lib/translation"
 
@@ -38,6 +38,14 @@ interface UploadedFile {
 }
 
 export default function ApplyPage() {
+  return (
+    <Suspense>
+      <ApplyPageContent />
+    </Suspense>
+  )
+}
+
+function ApplyPageContent() {
   const searchParams = useSearchParams()
   const courseId = searchParams.get("courseId")
   const [course, setCourse] = useState<Course | null>(null)
@@ -122,7 +130,7 @@ export default function ApplyPage() {
           返回课程列表
         </button>
 
-        <Card className="bg-white/80 backdrop-blur-sm p-6">
+        <Card className="bg-white/70 backdrop-blur-sm p-6">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-slate-800 mb-2">申请表</h1>
             <p className="text-slate-600">

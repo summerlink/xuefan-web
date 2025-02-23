@@ -14,7 +14,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { locationLabels, levelLabels, intakeLabels } from "@/lib/translation"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 
 interface Course {
   id: number
@@ -52,6 +52,14 @@ type FilterKey = "location" | "level" | "intake"
 const ITEMS_PER_PAGE = 10
 
 export default function CoursesPage() {
+  return (
+    <Suspense>
+      <CoursesPageContent />
+    </Suspense>
+  )
+}
+
+function CoursesPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [courses, setCourses] = useState<CourseResponse | null>(null)
@@ -118,9 +126,8 @@ export default function CoursesPage() {
     router.push(`/courses?${params.toString()}`)
   }
 
-  const handleApply = (university: string, courseId: number) => {
+  const handleApply = (courseId: number) => {
     const params = new URLSearchParams({
-      university,
       courseId: courseId.toString(),
     })
     router.push(`/apply?${params.toString()}`)
@@ -236,7 +243,7 @@ export default function CoursesPage() {
                         {course.intakes.map((intake) => intakeLabels[intake]).join(", ")}
                       </span>
                     </div>
-                    <Button className="mt-4 w-full" onClick={() => handleApply(course.relatedSchools.name, course.id)}>
+                    <Button className="mt-4 w-full" onClick={() => handleApply(course.id)}>
                       提交申请
                     </Button>
                   </div>
