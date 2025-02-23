@@ -18,7 +18,7 @@ export default function Page() {
             <span className="text-slate-700">精选课程</span>
           </div>
           <div className="flex flex-col items-center p-4 rounded-lg bg-white/70 backdrop-blur-sm">
-            <span className="text-4xl font-bold text-fuchsia-500 mb-2">{formatNumber(10)}+</span>
+            <span className="text-4xl font-bold text-fuchsia-500 mb-2">{formatNumber(150)}+</span>
             <span className="text-slate-700">合作院校</span>
           </div>
           <div className="flex flex-col items-center p-4 rounded-lg bg-white/70 backdrop-blur-sm">
