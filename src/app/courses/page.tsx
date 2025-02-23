@@ -283,7 +283,7 @@ function CoursesPageContent() {
                     <div className="flex justify-between">
                       <span className="text-slate-600">入学月份</span>
                       <span className="font-medium text-slate-800">
-                        {course.intakes.map((intake) => intakeLabels[intake]).join(", ")}
+                        {course.intakes.length === 12 ? "全年" : course.intakes.map((intake) => intakeLabels[intake]).join(", ")}
                       </span>
                     </div>
                     <Button className="mt-4 w-full" onClick={() => handleApply(course.relatedSchools.name, course.id)}>
