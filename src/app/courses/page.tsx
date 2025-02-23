@@ -14,7 +14,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { locationLabels, levelLabels, intakeLabels, type University } from "@/lib/translation"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { formatNumber } from "@/lib/utils"
 
 interface Course {
@@ -53,6 +53,14 @@ type FilterKey = "location" | "level" | "intake" | "university"
 const ITEMS_PER_PAGE = 10
 
 export default function CoursesPage() {
+  return (
+    <Suspense>
+      <CoursesPageContent />
+    </Suspense>
+  )
+}
+
+function CoursesPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [courses, setCourses] = useState<CourseResponse | null>(null)
