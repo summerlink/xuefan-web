@@ -4,57 +4,61 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { locationLabels, levelLabels, intakeLabels, type University } from "@/lib/translation"
 
 const steps = [
   {
     title: "选择地点",
     options: ["selangor", "johor", "penang", "kuala_lumpur", "kuching", "sarawak", "perak"],
     labels: {
-      selangor: "雪兰莪",
-      johor: "柔佛",
-      penang: "槟城",
-      kuala_lumpur: "吉隆坡",
-      kuching: "古晋",
-      sarawak: "砂拉越",
-      perak: "霹雳",
+      ...locationLabels,
     },
   },
   {
     title: "选择学历",
     options: ["foundation", "diploma", "degree", "master", "phd", "certificate"],
     labels: {
-      foundation: "预科",
-      diploma: "专科",
-      degree: "本科",
-      master: "硕士",
-      phd: "博士",
-      certificate: "证书",
+      ...levelLabels,
     },
   },
   {
     title: "选择入学时间",
     options: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
     labels: {
-      "1": "1月",
-      "2": "2月",
-      "3": "3月",
-      "4": "4月",
-      "5": "5月",
-      "6": "6月",
-      "7": "7月",
-      "8": "8月",
-      "9": "9月",
-      "10": "10月",
-      "11": "11月",
-      "12": "12月",
+      ...intakeLabels,
     },
+  },
+  {
+    title: "选择院校",
+    options: [] as string[],
+    labels: {} as Record<string, string>,
   },
 ]
 
 export default function SearchPage() {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<Record<number, string>>({})
+  const [universities, setUniversities] = useState<University[]>([])
+
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const response = await fetch(
+          "https://homeseek-cms.vercel.app/api/universities?depth=0&select[name]=true&limit=100",
+        )
+        const data = await response.json()
+        setUniversities(data.docs)
+        // Update steps with universities data
+        steps[3].options = data.docs.map((uni: University) => uni.id.toString())
+        steps[3].labels = Object.fromEntries(data.docs.map((uni: University) => [uni.id.toString(), uni.name]))
+      } catch (error) {
+        console.error("Error fetching universities:", error)
+      }
+    }
+
+    fetchUniversities()
+  }, [])
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -65,6 +69,7 @@ export default function SearchPage() {
         location: formData[0] || "",
         level: formData[1] || "",
         intake: formData[2] || "",
+        university: formData[3] || "",
       })
       window.location.href = `/courses?${params.toString()}`
     }
@@ -138,4 +143,3 @@ export default function SearchPage() {
     </main>
   )
 }
-

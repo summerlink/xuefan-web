@@ -31,3 +31,8 @@ export const intakeLabels: Record<string, string> = {
   "11": "11月",
   "12": "12月",
 }
+
+export interface University {
+  id: number
+  name: string
+}

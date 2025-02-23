@@ -12,9 +12,9 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { locationLabels, levelLabels, intakeLabels } from "@/lib/translation"
+import { locationLabels, levelLabels, intakeLabels, type University } from "@/lib/translation"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { formatNumber } from "@/lib/utils"
 
 interface Course {
@@ -48,30 +48,40 @@ const filterOptions = {
   intake: ["全部", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
 }
 
-type FilterKey = "location" | "level" | "intake"
+type FilterKey = "location" | "level" | "intake" | "university"
 
 const ITEMS_PER_PAGE = 10
 
 export default function CoursesPage() {
-  return (
-    <Suspense>
-      <CoursesPageContent />
-    </Suspense>
-  )
-}
-
-function CoursesPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [courses, setCourses] = useState<CourseResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [universities, setUniversities] = useState<University[]>([])
   const [filters, setFilters] = useState({
     location: searchParams.get("location") || "",
     level: searchParams.get("level") || "",
     intake: searchParams.get("intake") || "",
+    university: searchParams.get("university") || "",
   })
 
   const currentPage = Number(searchParams.get("page")) || 1
+
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const response = await fetch(
+          "https://homeseek-cms.vercel.app/api/universities?depth=0&select[name]=true&limit=100",
+        )
+        const data = await response.json()
+        setUniversities(data.docs)
+      } catch (error) {
+        console.error("Error fetching universities:", error)
+      }
+    }
+
+    fetchUniversities()
+  }, [])
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -87,6 +97,9 @@ function CoursesPageContent() {
         }
         if (filters.intake) {
           queryParams.set("where[intakes][contains]", filters.intake)
+        }
+        if (filters.university) {
+          queryParams.set("where[relatedSchools.relatedUniversities.id][equals]", filters.university)
         }
 
         queryParams.set("depth", String(2))
@@ -127,8 +140,9 @@ function CoursesPageContent() {
     router.push(`/courses?${params.toString()}`)
   }
 
-  const handleApply = (courseId: number) => {
+  const handleApply = (university: string, courseId: number) => {
     const params = new URLSearchParams({
+      university,
       courseId: courseId.toString(),
     })
     router.push(`/apply?${params.toString()}`)
@@ -148,7 +162,7 @@ function CoursesPageContent() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-800 mb-4">搜索结果</h1>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-600">地点</label>
               <Select value={filters.location || "全部"} onValueChange={(value) => updateFilters("location", value)}>
@@ -191,6 +205,26 @@ function CoursesPageContent() {
                   {filterOptions.intake.map((option) => (
                     <SelectItem key={option} value={option}>
                       {option === "全部" ? option : intakeLabels[option] || option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-600">院校</label>
+              <Select
+                value={filters.university || "全部"}
+                onValueChange={(value) => updateFilters("university", value)}
+              >
+                <SelectTrigger className="bg-white/70 backdrop-blur-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="全部">全部</SelectItem>
+                  {universities.map((uni) => (
+                    <SelectItem key={uni.id} value={uni.id.toString()}>
+                      {uni.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -244,7 +278,7 @@ function CoursesPageContent() {
                         {course.intakes.map((intake) => intakeLabels[intake]).join(", ")}
                       </span>
                     </div>
-                    <Button className="mt-4 w-full" onClick={() => handleApply(course.id)}>
+                    <Button className="mt-4 w-full" onClick={() => handleApply(course.relatedSchools.name, course.id)}>
                       提交申请
                     </Button>
                   </div>
