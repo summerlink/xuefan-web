@@ -39,7 +39,7 @@ const steps = [
 export default function SearchPage() {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<Record<number, string>>({})
-  const [universities, setUniversities] = useState<University[]>([])
+  const [, setUniversities] = useState<University[]>([])
 
   useEffect(() => {
     const fetchUniversities = async () => {
