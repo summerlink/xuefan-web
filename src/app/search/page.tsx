@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { locationLabels, levelLabels, intakeLabels, type University } from "@/lib/translation"
 
 const steps = [
@@ -37,6 +37,14 @@ const steps = [
 ]
 
 export default function SearchPage() {
+  return (
+    <Suspense>
+      <SearchPageContent />
+    </Suspense>
+  )
+}
+
+function SearchPageContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<Record<number, string>>({})
   const [, setUniversities] = useState<University[]>([])
