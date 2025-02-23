@@ -4,7 +4,7 @@ import { formatNumber } from "@/lib/utils"
 
 export default function Page() {
   return (
-    <main className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center">
+    <main className="flex h-[calc(100vh-7rem)] flex-col items-center justify-center">
       <div className="relative z-10 text-center px-4">
         <h1 className="mb-6 text-4xl font-bold tracking-tight bg-gradient-to-r from-violet-600 via-fuchsia-500 to-rose-500 bg-clip-text text-transparent sm:text-6xl lg:text-7xl">
           学帆
@@ -33,7 +33,7 @@ export default function Page() {
           立即搜索
         </Link>
       </div>
-      <div className="w-full mt-12">
+      <div className="hidden md:block w-full mt-12">
         <InfiniteSlider />
       </div>
     </main>
